@@ -1,28 +1,29 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
+
+#include <time.h>
 
 #include <ncurses.h>
 
 #include "ncurapi.h"
 
 int main(void) {
-	struct triangle tr = {
-		.x = 40,
-		.y = 5,
-		.sym = '@',
-		.k = 2,
-		.size = 10,
-		.base = false
-	};
+	srand(time(NULL));
+
+	struct tree *tre = NULL;
 
 	initscr();
 	curs_set(0);
 
-	draw_triangle(&tr);
+	tre = tree_init_rand(tre);
+	tree_draw(tre);
 
 	getch();
 	curs_set(2);
 	endwin();
+
+	free(tre);
 
 	return 0;
 }
