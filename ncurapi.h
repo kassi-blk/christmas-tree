@@ -14,7 +14,7 @@
 #define TRUNK_HEIGHT_MIN 2
 #define TRUNK_HEIGHT_MAX 4
 
-#define GARLAND_DECLINE 2
+#define GARLAND_RISE 2
 #define GARLAND_SYM 'O'
 
 #define TREE_TIP_SIZE_MIN 3
@@ -22,6 +22,8 @@
 #define TREE_PARTS_MIN 2
 #define TREE_PARTS_MAX 6
 #define TREE_PARTS_SIZE_OFFSET 5
+#define TREE_K_MIN 1
+#define TREE_K_MAX 4
 
 struct triangle {
 	int x;
@@ -32,7 +34,7 @@ struct triangle {
 	bool base;
 	bool fill;
 	bool garland;
-	struct toy *ty;
+	int *line;
 };
 
 struct trunk {

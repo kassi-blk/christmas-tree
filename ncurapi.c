@@ -46,12 +46,13 @@ tree_init_rand(struct tree *tre) {
 			max_x - (count * TREE_PARTS_SIZE_OFFSET * size));
 		y = 2;
 		sym = random(33, 96);
-		k = 1;
+		k = random(TREE_K_MIN, TREE_K_MAX);
 	}
 
 	tre->tr = malloc(sizeof(struct triangle) * count);
 
 	int i;
+	int j;
 
 	for (i = 0; i < count; i++) {
 		tre->tr[i].x = x;
@@ -62,12 +63,21 @@ tree_init_rand(struct tree *tre) {
 		tre->tr[i].base = true;
 		tre->tr[i].fill = true;
 		tre->tr[i].garland = true;
+		tre->tr[i].line = malloc(sizeof(int) * tre->tr[i].size);
 
-		/*
-		 * check if (<current_triangle.x> + <current_triangle.size>)                        > max_x,
-		 *       if (<current_triangle.x> - <current.triangle.size>)                        >     0
-		 *       if (<current_triangle.y> + <current.triangle.size> / <current.triangle.k>) > max_y
-		 */
+		/* get triangle line size */
+		int line_size = 0;
+
+		for (j = 0; j < tre->tr[i].size; j++) {
+			tre->tr[i].line[j] = 1 + line_size;
+
+			if (j % tre->tr[i].k == 0)
+				line_size += 2;
+		}
+
+		/* check if (<current_triangle.x> + <current_triangle.size>) > max_x,
+		   check if (<current_triangle.x> - <current.triangle.size>) > 0,
+		   check if (<current_triangle.y> + <current.triangle.size> / <current.triangle.k>) > max_y */
 		if (tre->tr[i].x + tre->tr[i].size / tre->tr[i].k > (max_x - 1) ||
 			tre->tr[i].x - tre->tr[i].size < 0 ||
 			tre->tr[i].y + tre->tr[i].size > (max_y - 1))
@@ -79,22 +89,20 @@ tree_init_rand(struct tree *tre) {
 	/* trunk */
 	tre->tru = malloc(sizeof(struct trunk));
 
-trunk:
+trunk_set:
 	tre->tru->x = tre->tr[tre->count - 1].x;
 	tre->tru->y = tre->tr[tre->count - 1].y + tre->tr[tre->count - 1].size;
 	tre->tru->sym = random(33, 96);
 	tre->tru->thickness = random(2, tre->tr[tre->count - 1].size / 2);
 	tre->tru->height = random(TRUNK_HEIGHT_MIN, TRUNK_HEIGHT_MAX);
 
-	/*
-	 * check if (<last_triangle.x> + <its_size.x>)                  > max_x,
-	 *       if (<last_triangle.y> + <its_size.y> + <trunk_height>) > max_y
-	 */
+	/* check if (<last_triangle.x> + <its_size.x>) > max_x,
+	   check if (<last_triangle.y> + <its_size.y> + <trunk_height>) > max_y */
 	while (tre->tr[tre->count - 1].x + tre->tr[tre->count - 1].size
 		> (max_x - 1) || tre->tr[tre->count - 1].y +
 		tre->tr[tre->count - 1].size + tre->tru->height > (max_y - 1)) {
 		tre->count--;
-		goto trunk;
+		goto trunk_set;
 	}
 
 	return tre;
@@ -152,22 +160,17 @@ trunk_draw(struct trunk *tru, int k) {
 
 void
 garland_draw(struct triangle *tr, char sym) {
-	int k = tr->size / tr->k - (GARLAND_DECLINE - 1) +
-		(tr->k > 1 ? tr->k - 1 : 0);
-	int i = tr->size;
-	int j;
+	int width = tr->line[(tr->size - 1) - GARLAND_RISE] / 2;
+	int i;
 
 	/* "hang" garland on triangle */
-	for (j = (-k + 1) + 1; j < k - 1; j++) {
-		if (colors_support)
-			color_on(random(3, 7));
+	for (i = -width; i < width + 1; i++) {
+		color_on(random(3, 7));
 
-		if (j == (-k + 1) + 1 || j == (k - 1) - 1)
-			sym_set(sym, tr->x + j, tr->y +
-				(i - GARLAND_DECLINE - 1));
+		if (i == -width || i == width)
+			sym_set(sym, tr->x + i, tr->y + (tr->size - (GARLAND_RISE + 1)));
 		else
-			sym_set(sym, tr->x + j, tr->y +
-				(i - GARLAND_DECLINE));
+			sym_set(sym, tr->x + i, tr->y + (tr->size - GARLAND_RISE));
 	}
 
 	if (colors_support)

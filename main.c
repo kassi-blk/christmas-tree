@@ -14,21 +14,23 @@ int main(int argc, char *argv[]) {
 	bool rand_flag = false;
 
 	if (argc == 2 && strcmp(argv[1], "--help") == 0) {
-		printf("usage: ./prog <x> <y> <sym> <k>     \n");
-		printf("x   - tree pos x                    \n");
-		printf("y   - tree pos y                    \n");
-		printf("sym - tree sym                      \n");
-		printf("k   - tree compress coefficient     \n");
-		printf("------------------------------------\n");
-		printf("also you can use: ./prog <flag>     \n");
-		printf("<flag> may be next:                 \n");
-		printf("-r, --rand              random tree \n");
-		printf("------------------------------------\n");
-		printf("about k:                            \n");
-		printf("(0)    #     k = 1  |   #     k = 2 \n");
-		printf("(1)   # #           |  # #          \n");
-		printf("(2)  #   #          |  # #          \n");
-		printf("(3) #######         | #####         \n");
+		printf("<...> - necessarily                     \n");
+		printf("[...] - optionaly                       \n");
+		printf("----------------------------------------\n");
+		printf("usage: ./prog <x> <y> <sym> <k> [flags] \n");
+		printf("x   - tree pos x                        \n");
+		printf("y   - tree pos y                        \n");
+		printf("sym - tree sym                          \n");
+		printf("k   - tree compress coefficient         \n");
+		printf("----------------------------------------\n");
+		printf("flags:                                  \n");
+		printf("    -r, --rand               random tree\n");
+		printf("----------------------------------------\n");
+		printf("about k:                                \n");
+		printf("(0)      #     k = 1  |   #     k = 2   \n");
+		printf("(1)     # #           |  # #            \n");
+		printf("(2)    #   #          |  # #            \n");
+		printf("(3)   #######         | #####           \n");
 
 		return 0;
 	} else if ((argc == 2 && strcmp(argv[1], "--rand") == 0) ||
@@ -45,10 +47,6 @@ int main(int argc, char *argv[]) {
 		rand_flag = false;
 
 		return 1;
-	} else {
-		printf("type --help for more information\n");
-
-		return 1;
 	}
 
 	char *px;
@@ -63,6 +61,12 @@ int main(int argc, char *argv[]) {
 	if (!rand_flag) {
 		if (*px != '\0' || *py != '\0' || *pk != '\0') {
 			printf("strange arguments...\n");
+
+			return 1;
+		}
+
+		if (k < 1) {
+			printf("k must be greater than 0\n");
 
 			return 1;
 		}
