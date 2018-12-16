@@ -33,7 +33,6 @@ struct triangle {
 	int size;
 	bool base;
 	bool fill;
-	bool garland;
 	int *line;
 };
 
@@ -51,14 +50,14 @@ struct tree {
 	char sym;
 	int k;
 	int count;
+	bool garland;
 	struct triangle *tr;
 	struct trunk *tru;
 };
 
 void          pos_set(int x, int y);
 void          sym_set(char sym, int x, int y);
-struct tree * tree_init(struct tree *tre, int x, int y, char sym, int k);
-struct tree * tree_init_rand(struct tree *tre);
+struct tree * tree_init(struct tree *tre);
 void          triangle_draw(struct triangle *tr);
 void          trunk_draw(struct trunk *tru, int k);
 void          garland_draw(struct triangle *tr, char sym);

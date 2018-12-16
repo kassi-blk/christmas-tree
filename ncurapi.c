@@ -12,57 +12,37 @@ sym_set(char sym, int x, int y) {
 }
 
 struct tree *
-tree_init(struct tree *tre, int x, int y, char sym, int k) {
-	tre = malloc(sizeof(struct tree));
-
-	tre->x = x;
-	tre->y = y;
-	tre->sym = sym;
-	tre->k = k;
-
-	return tre;
-}
-
-struct tree *
-tree_init_rand(struct tree *tre) {
+tree_init(struct tree *tre) {
 	int max_x = getmaxx(stdscr);
 	int max_y = getmaxy(stdscr);
 	int size = random(TREE_TIP_SIZE_MIN, TREE_TIP_SIZE_MAX);
 	int count = random(TREE_PARTS_MIN, TREE_PARTS_MAX);
 
-	int x;
-	int y;
-	char sym;
-	int k;
-
-	if (tre != NULL) {
-		x = tre->x;
-		y = tre->y;
-		sym = tre->sym;
-		k = tre->k;
-	} else {
+	if (tre == NULL) {
 		tre = malloc(sizeof(struct tree));
-		x = random(count * TREE_PARTS_SIZE_OFFSET * size,
+
+		tre->x = random(count * TREE_PARTS_SIZE_OFFSET * size,
 			max_x - (count * TREE_PARTS_SIZE_OFFSET * size));
-		y = 2;
-		sym = random(33, 96);
-		k = random(TREE_K_MIN, TREE_K_MAX);
+		tre->y = 2;
+		tre->sym = random(33, 96);
+		tre->k = random(TREE_K_MIN, TREE_K_MAX);
+		tre->garland = true;
 	}
 
+	/* triangles */
 	tre->tr = malloc(sizeof(struct triangle) * count);
 
 	int i;
 	int j;
 
 	for (i = 0; i < count; i++) {
-		tre->tr[i].x = x;
-		tre->tr[i].y = y += (i > 0 ? tre->tr[i - 1].size / 2 : 0);
-		tre->tr[i].sym = sym;
-		tre->tr[i].k = k;
+		tre->tr[i].x = tre->x;
+		tre->tr[i].y = tre->y += (i > 0 ? tre->tr[i - 1].size / 2 : 0);
+		tre->tr[i].sym = tre->sym;
+		tre->tr[i].k = tre->k;
 		tre->tr[i].size = size += TREE_PARTS_SIZE_OFFSET;
 		tre->tr[i].base = true;
 		tre->tr[i].fill = true;
-		tre->tr[i].garland = true;
 		tre->tr[i].line = malloc(sizeof(int) * tre->tr[i].size);
 
 		/* get triangle line size */
@@ -186,7 +166,7 @@ tree_draw(struct tree *tre) {
 
 	/* draw garland here because otherwise it will be erased by triangles */
 	for (i = 0; i < tre->count; i++) {
-		if (tre->tr[i].garland)
+		if (tre->garland)
 			garland_draw(&tre->tr[i], GARLAND_SYM);
 	}
 
