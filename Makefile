@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall
 LDFLAGS=-lncurses
-OBJS=main.o ncurapi.o
+OBJS=main.o ncurapi.o tree.o
 DEPS=ncruapi.h
 PROG_NAME=prog
 
